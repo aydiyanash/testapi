@@ -1,7 +1,7 @@
 import Sequelize from "sequelize";
 import db from "../database/db"
 
-module.exports = db.sequelize.define(
+const User = db.sequelize.define(
     'users',
     {
         id:{
@@ -11,31 +11,43 @@ module.exports = db.sequelize.define(
         },
         phone: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNull: true,
             unique: {
                 msg: 'email already exists'
-            },
-            validate: {
-                notEmpty: {
-                    msg: 'phone num should not be empty'
-                }
             }
-
         },
         email: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNull: true,
             unique: {
                 msg: 'email already exists'
             },
             validate: {
                 isEmail: {
                     msg: 'Not a valid email'
-                },
-                notEmpty: {
-                    msg: 'email should not be empty'
                 }
             }
-        }
+        },
+        password : {
+            type : Sequelize.STRING,
+            allowNull: false
+
+        },
     }
 );
+
+
+function generateHash(user) {
+    if (user === null) {
+        throw new Error('User not found');
+    }
+    else if (!user.changed('password')) return user.password;
+    else {
+        return user.password = user.password && user.password !== "" ? bcrypt.hashSync(user.password, 10) : "";
+    }
+}
+
+User.beforeCreate(generateHash);
+User.beforeUpdate(generateHash);
+
+module.exports = User;

@@ -1,7 +1,7 @@
 import Sequelize from "sequelize";
 const db = {};
 
-const sequelize = new Sequelize('test_db','root','password',{
+const sequelize = new Sequelize('test_db','root','1234567',{
     host: 'localhost',
     dialect: 'mysql',
     operatorsAliases: false,

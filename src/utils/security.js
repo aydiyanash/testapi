@@ -4,7 +4,7 @@ import _trim from "lodash/trim";
 
 class Security {
     static generatePasswordHash(password, option = 10) {
-        return bcrypt.hashSync(_trim(password), option);
+        return bcrypt.hashSync(password, option);
     }
 
     static validatePassword(password, candidate) {
