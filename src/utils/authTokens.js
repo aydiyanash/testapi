@@ -1,0 +1,71 @@
+import jwt from 'jsonwebtoken'
+import config from "../../config"
+const { User } = require('../../models');
+
+class authTokens {
+    static async createTokens(user) {
+        const createToken = jwt.sign(
+            {
+                user: user.id,
+            },
+            config.secret,
+            {
+                expiresIn: '10m',
+            },
+        );
+
+        const createRefreshToken = jwt.sign(
+            {
+                user: user.id,
+            },
+            config.refreshSecret,
+            {
+                expiresIn: '7d',
+            },
+        );
+
+        return Promise.all([createToken, createRefreshToken]);
+    }
+
+    static async refreshTokens(token,refreshToken,res){
+        let userId = -1;
+        try {
+            jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
+                if(err){
+                    return res.json({
+                        success: false,
+                        message: err.message
+                    });
+                }
+
+                userId = decoded.user;
+            });
+        } catch (err) {
+            return res.json({
+                success: false,
+                message: err
+            });
+        }
+
+        try {
+            const user = await User.findOne({
+                where: {
+                    id: userId
+                }
+            });
+            const [newToken, newRefreshToken] = await this.createTokens(user);
+            return {
+                token: newToken,
+                refreshToken: newRefreshToken,
+            };
+        }
+        catch (e) {
+            return res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+}
+
+module.exports = authTokens;

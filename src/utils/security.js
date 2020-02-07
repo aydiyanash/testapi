@@ -1,10 +1,9 @@
 
 import bcrypt from "bcrypt";
-import _trim from "lodash/trim";
 
 class Security {
-    static generatePasswordHash(password, option = 10) {
-        return bcrypt.hashSync(password, option);
+    static generatePasswordHash(password) {
+        return bcrypt.hashSync(password, 10);
     }
 
     static validatePassword(password, candidate) {
