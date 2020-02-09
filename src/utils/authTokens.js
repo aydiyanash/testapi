@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 import config from "../../config"
+import blacklist from  'express-jwt-blacklist'
+
 const { User } = require('../../models');
 const crypto = require("crypto");
 
@@ -70,6 +72,10 @@ class authTokens {
                 message: e.message
             });
         }
+    }
+    
+    static revokeToken (user) {
+        blacklist.revoke(user);
     }
 }
 

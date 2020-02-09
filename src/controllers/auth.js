@@ -1,6 +1,5 @@
 import security from '../utils/security'
 import authTokens from '../utils/authTokens'
-import blacklist from  'express-jwt-blacklist'
 
 const { User } = require('../../models');
 const { Op } = require('sequelize');
@@ -98,7 +97,7 @@ class Auth {
     }
 
     static logOut (req, res) {
-        blacklist.revoke(req.user);
+        authTokens.revokeToken(req.user);
         return res.json({
             success: true,
             message: 'Logged out'
