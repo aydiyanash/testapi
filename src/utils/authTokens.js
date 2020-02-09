@@ -1,12 +1,16 @@
 import jwt from 'jsonwebtoken'
 import config from "../../config"
 const { User } = require('../../models');
+const crypto = require("crypto");
+
 
 class authTokens {
     static async createTokens(user) {
         const createToken = jwt.sign(
             {
-                user: user.id,
+                user: user.email || user.phone,
+                id: user.id,
+                sub: crypto.randomBytes(16).toString("hex")
             },
             config.secret,
             {
@@ -16,7 +20,8 @@ class authTokens {
 
         const createRefreshToken = jwt.sign(
             {
-                user: user.id,
+                user: user.email || user.phone,
+                id: user.id
             },
             config.refreshSecret,
             {
@@ -38,7 +43,7 @@ class authTokens {
                     });
                 }
 
-                userId = decoded.user;
+                userId = decoded.user.id;
             });
         } catch (err) {
             return res.json({

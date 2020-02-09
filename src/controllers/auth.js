@@ -1,16 +1,15 @@
 import security from '../utils/security'
 import authTokens from '../utils/authTokens'
-import jwt from "jsonwebtoken";
-import config from "../../config";
+import blacklist from  'express-jwt-blacklist'
 
 const { User } = require('../../models');
 const { Op } = require('sequelize');
 
 
 class Auth {
-    static async signIn(req, res) {
+    static async signIn (req, res) {
         let phoneOrEmail = req.body.id;
-        let password = req.body.password;
+        let { password } = req.body;
 
         try {
 
@@ -46,7 +45,6 @@ class Auth {
             }
 
         } catch (e) {
-            console.log(e, 'e');
             res.json({
                 success: false,
                 message: e
@@ -54,7 +52,7 @@ class Auth {
         }
     }
 
-    static async signUp(req, res) {
+    static async signUp (req, res) {
         if (!req.body.id || !req.body.password) {
             res.json({
                 success: false,
@@ -73,7 +71,6 @@ class Auth {
         }
 
         record.password = req.body.password;
-        console.log(record, 'record');
 
         try {
             const user = await User.create(record);
@@ -88,16 +85,39 @@ class Auth {
         } catch (e) {
             res.json({
                 success: false,
-                message: e.errors[0].message
+                message: e.message
             })
         }
     }
 
-    static async newToken(req, res) {
+    static async newToken (req, res) {
         const bearerToken = req.token;
         const refreshToken = req.body.refresh_token;
         const response = await authTokens.refreshTokens(bearerToken, refreshToken, res);
         res.json(response);
+    }
+
+    static logOut (req, res) {
+        blacklist.revoke(req.user);
+        return res.json({
+            success: true,
+            message: 'Logged out'
+        });
+    }
+
+    static async getInfo (req, res) {
+        try{
+            return res.json({
+                success: true,
+                id: req.user.user
+            });
+        }
+        catch (e) {
+            res.json({
+                success: false,
+                message: e.message
+            })
+        }
     }
 }
 

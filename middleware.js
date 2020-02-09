@@ -1,34 +1,19 @@
-import jwt from "jsonwebtoken";
-import config from "./config.js"
-import authTokens from "./src/utils/authTokens";
+let returnToken = (req, res, next) => {
+    let token = req.headers['authorization'];
+    token = token.replace("Bearer ","");
+    res.token = token;
+    next();
+};
 
-let checkToken = (req, res, next) => {
-    let token = req.headers['x-access-token'] || req.headers['authorization'];
-    const refreshToken = req.headers['x-refresh-token'];
-    if (token) {
-        if (token.startsWith('Bearer ')) {
-            token = token.slice(7, token.length);
-        }
-        jwt.verify(token, config.secret, (err, decoded) => {
-            if (err) {
-                return res.json({
-                    success: false,
-                    message: 'Token is not valid'
-                });
-            } else {
-                req.decoded = decoded;
-                req.token   = token;
-                next();
-            }
-        });
-    } else {
-        return res.json({
-            success: false,
-            message: 'Auth token is not supplied'
-        });
+let authorizationError = (err, req, res, next) => {
+    if(err.name === 'UnauthorizedError') {
+        res.status(err.status).send({status: err.status, message: err.message});
+        return;
     }
+    next();
 };
 
 module.exports = {
-    checkToken: checkToken
+    returnToken: returnToken,
+    authorizationError: authorizationError
 };
