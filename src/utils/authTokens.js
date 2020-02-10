@@ -34,7 +34,7 @@ class authTokens {
         return Promise.all([createToken, createRefreshToken]);
     }
 
-    static async refreshTokens(token,refreshToken,res){
+    static async refreshTokens(refreshToken,res){
         let userId = -1;
         try {
             jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {

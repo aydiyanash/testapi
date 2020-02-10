@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-routes.routes(app, middleware);
+routes.routes(app);
 
 const init = async () => {
     await database.init();

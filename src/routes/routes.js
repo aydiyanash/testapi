@@ -4,12 +4,12 @@ import files from "../controllers/files"
 const fileUpload = require("express-fileupload");
 
 
-const routes = (app, middleware) => {
+const routes = (app) => {
 
     // auth routes
     app.post('/signin', auth.signIn);
     app.post('/signup', auth.signUp);
-    app.post('/signin/new_token',[middleware.returnToken, auth.newToken]);
+    app.post('/signin/new_token', auth.newToken);
 
     app.get('/logout', auth.logOut);
     app.get('/info', auth.getInfo);

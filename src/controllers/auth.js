@@ -90,9 +90,8 @@ class Auth {
     }
 
     static async newToken (req, res) {
-        const bearerToken = req.token;
         const refreshToken = req.body.refresh_token;
-        const response = await authTokens.refreshTokens(bearerToken, refreshToken, res);
+        const response = await authTokens.refreshTokens(refreshToken, res);
         res.json(response);
     }
 
